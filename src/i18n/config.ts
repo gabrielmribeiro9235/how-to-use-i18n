@@ -4,8 +4,8 @@ import LanguageDetector from "i18next-browser-languagedetector";
 
 import { initReactI18next } from "react-i18next";
 
-import ptCommon from "../locales/pt/common.json";
-import enCommon from "../locales/en/common.json";
+import ptCommon from "../locales/pt/common/common.json";
+import enCommon from "../locales/en/common/common.json";
 
 i18n
   .use(LanguageDetector)
