@@ -33,7 +33,7 @@ i18n
       },
     },
 
-    fallbackLng: "en",
+    fallbackLng: "pt",
 
     detection: {
       order: ["localStorage", "navigator"],
