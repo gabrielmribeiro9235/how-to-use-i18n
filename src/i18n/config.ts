@@ -6,6 +6,8 @@ import { initReactI18next } from "react-i18next";
 
 import ptCommon from "../locales/pt/common/common.json";
 import enCommon from "../locales/en/common/common.json";
+import ptHome from "../locales/pt/Home/home.json";
+import enHome from "../locales/en/Home/home.json";
 
 i18n
   .use(LanguageDetector)
@@ -14,10 +16,12 @@ i18n
     resources: {
       pt: {
         "common": ptCommon,
+        "home": ptHome,
       },
 
       en: {
         "common": enCommon,
+        "home": enHome,
       },
     },
 
