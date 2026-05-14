@@ -39,7 +39,7 @@ Após ter instalado as dependências do i18n, para usá-lo, basta seguir esses p
 
 ## Configuração do i18n
 
-Imaginando o caso hipotético em que eu só tenha a página xpto e eu vou configurar um namaspace para traduzir essa página para inglês e português.
+Imaginando o caso hipotético em que eu só tenha a página xpto e eu vou configurar um namespace para traduzir essa página para inglês e português.
 
 ### `src/i18n/config.ts`
 
@@ -83,7 +83,9 @@ i18n
 export default i18n;
 ```
 
-****Para a tradução dar certo é necessário que a chave dentro de resources.pt e resources.en deve ser a mesma para cada namespace que é exatamente o que acontece em:**
+`fallbackLng` define qual idioma será utilizado caso a tradução procurada não exista.
+`escapeValue: false` evita escaping desnecessário de caracteres, já que o React já protege contra XSS automaticamente.
+****Para a tradução funcionar corretamente, a chave dentro de `resources.pt` e `resources.en` deve ser a mesma para cada namespace. Que é exatamente o que acontece em:**
 
 ```ts
 resources: {
@@ -179,7 +181,7 @@ export function Xpto() {
 
 ## Organização por Namespace
 
-Cada arquivo JSON de tradução é um namespace e deve ser configurado em `i18n/config.ts`.
+Cada namespace normalmente é representado por um arquivo JSON de tradução e deve ser configurado em `i18n/config.ts`.
 Ao invés de criar um arquivo de tradução para cada página, prefira organizar as traduções por domínio.
 Por exemplo, nesse projeto há 3 domínios, são eles: home, section1 e section2, e 5 páginas, são elas: home, section1/pageA, section1/pageB, section2/pageA e section2/pageB 
 
@@ -244,3 +246,197 @@ const { t } = useTranslation("sections/section1");
 <Text>{t("pageA.title")}</Text>
 ...
 ```
+
+# Uso do i18n na StArt
+
+No momento, todas as páginas visíveis na tela já tem arquivo JSON, namespace configurado e o `useTranslation`sendo importado. Além disso, o seletor de linguagem já está feito. 
+
+Assim, a internacionalização fica muito mais simples, apenas 4 passos:
+- adicionar o que você quer traduzir aos arquivos de tradução
+- importar o `useTranslation` no componente (se ainda não houver) 
+- criar a variável `t` com `useTranslation` (se ainda não houver)
+- usar a internacionalização que foi criada
+
+---
+
+## Namespaces da StArt
+
+- `"landing/homepage"` -> landing page
+- `"user/my-reviews"` -> página inicial, onde aparecem as revisões criadas 
+- `"user/profile"` -> página que mostra o perfil do usuário
+- `"structure/sidebar"` -> internacionalização da sidebar que é comum à aplicação inteira
+- `"review/planning-protocol"` -> esse namespace contém essas páginas:
+  
+  <img width="196" height="328" alt="image" src="https://github.com/user-attachments/assets/6323aa1e-f7a9-4f65-8011-3ed7c8433d18" />
+  
+- `"review/execution-identification"` -> página de Identification
+- `"review/execution-selection"` -> página de Selection
+- `"review/execution-extraction"` -> página de Extraction
+- `"review/summarization-graphics"` -> página de Graphics
+
+A construção dos namespaces seguiu o mesmo padrão da arquitetura de pastas da pasta `src/features`.
+
+## Exemplo de Uso
+
+Internacionalização da página inicial para um usuário que não tem nenhum revisão feita ficou assim:
+
+### Arquivos de Tradução
+
+`src/locales/pt/user/my-reviews.json`
+
+```json
+{
+    "header": "Início",
+    "createNewReview": {
+        "welcome": "Bem-vindo ao seu espaço de trabalho!",
+        "message": "Você ainda não tem nenhuma revisão. Vamos começar criando a sua primeira e iniciar sua jornada de pesquisa!",
+        "button": "Criar revisão"
+    },
+    ...
+}
+```
+
+`src/locales/en/user/my-reviews.json`
+
+```json
+{
+    "header": "Home",
+    "createNewReview": {
+        "welcome": "Welcome to your workspace!",
+        "message": "You don’t have any reviews yet. Let’s start by creating your first one and begin your research journey!",
+        "button": "Create review"
+    },
+    ...
+}
+```
+
+### Página Inicial
+
+`src/features/user/my-reviews/pages/MyReviews/index.tsx` 
+
+```tsx
+// External library
+import { Box, Flex } from "@chakra-ui/react";
+import { useTranslation } from "react-i18next";
+
+// Services
+import useGetReviewCard from "../../services/useGetReviewCard";
+
+// Components
+import FlexLayout from "@components/structure/Flex/Flex";
+import Header from "@components/structure/Header/Header";
+import Loader from "@components/feedback/Loader";
+import CardDefault from "@components/common/cards";
+
+// Factory
+import RenderCards from "../../factory/cards/RenderCards";
+import RenderCreateNewReview from "../../factory/cards/RenderCreateNewReview";
+
+// Styles
+import { flexStyles } from "./styles";
+
+export default function MyReviews() {
+  const { t } = useTranslation("user/my-reviews");
+  const { cardData, isLoaded } = useGetReviewCard();
+
+  return (
+    <FlexLayout navigationType="Default">
+      <Box w="100%" px="1rem" py="1rem" h="fit-content">
+        <Flex w="100%" h="2.5rem" alignItems="center" mb="2rem">
+          <Header text={t("header")} />
+        </Flex>
+      </Box>
+      <CardDefault backgroundColor="white" borderRadius="1rem">
+        <Box w="100%" px="1rem">
+          <Flex sx={flexStyles} w={"100%"} align="center" justify="center">
+            {!isLoaded && <Loader />}
+
+            {cardData && cardData.length == 0 && isLoaded && (
+              <RenderCreateNewReview />
+            )}
+
+            {cardData && cardData.length > 0 && isLoaded && (
+              <RenderCards data={cardData} />
+            )}
+          </Flex>
+        </Box>
+      </CardDefault>
+    </FlexLayout>
+  );
+}
+```
+
+Como o usuário no nosso exemplo não tem nenhuma revisão, será carregado o componente `<RenderCreateNewReview />`. A internacionalização dele ficou assim:
+
+### Componente RenderCreateNewReview
+
+`src/features/user/my-reviews/factory/cards/RenderCreateNewReview/index.tsx`
+
+```tsx
+import { Flex, Icon, Text } from "@chakra-ui/react";
+import { useTranslation } from "react-i18next";
+import { MdSentimentSatisfied } from "react-icons/md";
+import NavButton from "@components/common/buttons/NavigationButton";
+
+const container = {
+  w: "calc(100% - 2rem)",
+  h: "87.5vh",
+  justifyContent: "center",
+  alignItems: "center",
+  flexDirection: "column",
+  bg: "gray.50",
+  borderRadius: "1rem",
+  boxShadow: "sm",
+  gap: ".5rem",
+  mr: "2rem",
+};
+
+const button = {
+  display: "flex",
+  borderRadius: ".5rem",
+  gap: ".25rem",
+  justifyContent: "center",
+  alignItems: "center",
+  color: "white",
+  transition: "0.3s ease-in-out",
+  boxShadow: "md",
+  p: "1rem",
+  border: "2px solid white",
+  bg: "black",
+};
+
+const RenderCreateNewReview = () => {
+  const { t } = useTranslation("user/my-reviews");
+
+  return (
+    <Flex sx={container}>
+      <Icon as={MdSentimentSatisfied} boxSize={"4rem"} color="#263C56" />
+
+      <Text fontSize="xl" fontWeight="bold" color="gray.600">
+        {t("createNewReview.welcome")}
+      </Text>
+
+      <Text fontSize="md" color="gray.500">
+        {t("createNewReview.message")}
+      </Text>
+
+      <NavButton
+        text={t("createNewReview.button")}
+        path="/review/planning/protocol/general-definition"
+        sx={button}
+        _hover={{
+          bg: "white",
+          color: "black",
+          border: "2px solid black",
+        }}
+        w="15rem"
+        mt={4}
+      />
+    </Flex>
+  );
+};
+
+export default RenderCreateNewReview;
+```
+
+Dessa forma, toda vez que você for criar algo novo ou atualizar algo já existente que exiba texto na tela, basta você ir aos arquivos de tradução de português e inglês, adicionar os textos em português e em inglês e, por fim, usar `t()` para renderizar os textos traduzidos (verificando antes se `useTranslation` já foi importado e instanciado no componente) garantindo que você crie algo novo já internacionalizado ou não quebre a internacionalização já existente 
