@@ -1,0 +1,6 @@
+{
+  "pageA": {
+    "title": "Esse é a Página A da Seção 2",
+    "description": "A tradução dessa página não é um arquivo separado, é apenas parte do arquivo de tradução da Seção 2, a outra parte é a tradução da Página B dessa mesma Seção. Como as Páginas A e B estão no domínio da Seção 2, a tradução dessas duas páginas ficam no mesmo arquivo"
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "pageA": {
+    "title": "This is Section 2 Page A",
+    "description": "The translation for this page is not a separate file, it is just part of the Section 2 translation file. The other part contains the translation for Page B of the same section. Since Pages A and B belong to the Section 2 domain, the translations for both pages are stored in the same file"
+  }
+}
