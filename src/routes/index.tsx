@@ -1,11 +1,12 @@
 import { Routes, Route, Navigate } from "react-router-dom";
+import { Home } from "@/pages/Home/Home";
 
 export function AppRoutes() {
   return (
     <Routes>
       <Route path="/" element={<Navigate to="/home" />} />
 
-      <Route path="/home" element={<h1>Home</h1>} />
+      <Route path="/home" element={<Home />} />
 
       <Route path="/section1/pageA" element={<h1>Section 1 - Page A</h1>} />
 
