@@ -1,6 +1,7 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import { Home } from "@/pages/Home/Home";
 import { Section1PageA } from "@/pages/Sections/Section1/PageA/PageA";
+import { Section1PageB } from "@/pages/Sections/Section1/PageB/PageB";
 
 export function AppRoutes() {
   return (
@@ -11,7 +12,7 @@ export function AppRoutes() {
 
       <Route path="/section1/pageA" element={<Section1PageA />} />
 
-      <Route path="/section1/pageB" element={<h1>Section 1 - Page B</h1>} />
+      <Route path="/section1/pageB" element={<Section1PageB />} />
 
       <Route path="/section2/pageA" element={<h1>Section 2 - Page A</h1>} />
 
